@@ -23,7 +23,7 @@ import importlib.util
 import numpy as np
 import pygame
 
-# ── Constants ─────────────────────────────────────────────────────────────────
+# ── Constants ───────────────────────────────────────────────────────────────
 SCALE      = 100        # pixels per metre
 BG_COLOR   = (255, 255, 255)
 ROBOT_COL  = ( 34, 139,  34)   # forest green
@@ -39,7 +39,7 @@ SENSE_COL  = (200, 230, 200)   # faint sensing circle
 
 FONT_SIZE  = 14
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────
 
 def _to_px(pos: np.ndarray, origin_px: tuple) -> tuple:
     """Convert world coords (metres, y-up) → pygame pixel coords (y-down)."""
@@ -194,16 +194,10 @@ class Simulator:
             print("[SIM] Continuing without pre-assigned targets.")
         print("[GLOBAL INIT] targets =", result)
 
-    # ── Physics step ──────────────────────────────────────────────────────────
+    # ── Physics step ───────────────────────────────────────────────────────────
 
     def _physics_step(self):
-        if i == 0 and self.step_count % 20 == 0:
-            print("\n[STEP]", self.step_count)
-            print("Robot0 pos:", self.pos[i])
-            print("Robot0 vel:", self.vel[i])
-            print("Target:", env_info.get("assigned_target"))
-            print("Neighbors:", len(env_info["neighbors"]))
-            new_vel = np.zeros_like(self.vel)
+        new_vel = np.zeros_like(self.vel)
 
         for i in range(self.n):
             state = {
@@ -231,6 +225,11 @@ class Simulator:
                 v = np.zeros(2)
 
             if i == 0 and self.step_count % 20 == 0:
+                print("\n[STEP]", self.step_count)
+                print("Robot0 pos:", self.pos[i])
+                print("Robot0 vel:", self.vel[i])
+                print("Target:", env_info.get("assigned_target"))
+                print("Neighbors:", len(env_info["neighbors"]))
                 print("Raw controller v:", v)
 
             new_vel[i] = _clamp_speed(v, self.max_speed)
@@ -276,7 +275,7 @@ class Simulator:
 
         self.step_count += 1
 
-    # ── Drawing ───────────────────────────────────────────────────────────────
+    # ── Drawing ────────────────────────────────────────────────────────────────
 
     def _draw(self):
         self.screen.fill(BG_COLOR)
@@ -359,7 +358,7 @@ class Simulator:
             lbl = self.font.render(str(i), True, (0, 0, 0))
             self.screen.blit(lbl, (px[0] + r_px + 1, px[1] - r_px))
 
-        # ── Info panel ────────────────────────────────────────────────────────
+        # ── Info panel ─────────────────────────────────────────────────────────
         px_start = self.sim_w_px
         pygame.draw.rect(self.screen, PANEL_COL,
                          (px_start, 0, self.panel_w, self.screen_h))
@@ -435,7 +434,7 @@ class Simulator:
 
         pygame.display.flip()
 
-    # ── Main loop ─────────────────────────────────────────────────────────────
+    # ── Main loop ──────────────────────────────────────────────────────────────
 
     def run(self):
         print("\n[SIM] Window open. Controls: SPACE=pause  S=sensing  R=reset  ESC=quit")
