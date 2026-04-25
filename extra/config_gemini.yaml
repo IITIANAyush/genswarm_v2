@@ -1,0 +1,18 @@
+# GenSwarm config
+# Put your API key here OR set env var OPENROUTER_API_KEY
+api_key: "AIzaSyB9jTyc-m6r6n9JDFtPDlZFFYHMIu0ZqBg"
+base_url: https://openrouter.ai/api/v1
+# More reliable alternatives if you get 504s:
+#   deepseek/deepseek-chat          (cheap, very reliable)
+#   openai/gpt-4o-mini              (reliable, costs more)
+#   google/gemini-2.0-flash-001     (original, sometimes 504s)
+model: google/gemini-2.0-flash-001
+
+# Simulation defaults (overridden by LLM analysis)
+robots: 10
+world_size: 5.0      # metres, world is [-world_size/2, world_size/2]
+robot_size: 0.08     # metres radius
+sensing_radius: 1.0  # metres
+max_speed: 0.5       # metres/second
+dt: 0.02             # physics timestep (seconds)
+fps: 50
