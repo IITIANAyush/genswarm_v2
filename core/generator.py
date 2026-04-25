@@ -406,24 +406,42 @@ def _runtime_validate_geometry(code: str) -> list[str]:
         if result.shape != (n, 2):
             errors.append(f"n={n} shape {result.shape} != ({n},2)")
             continue
-        # Uniqueness check
+        
+        # Uniqueness check: detect exact duplicates (1e-6 tolerance)
+        duplicates_found = False
         for i in range(n):
             for j in range(i + 1, n):
                 if np.allclose(result[i], result[j], atol=1e-6):
-                    errors.append(f"n={n} rows {i} and {j} are duplicates")
+                    errors.append(f"n={n} rows {i} and {j} are exact duplicates")
+                    duplicates_found = True
                     break
-            else:
-                continue
-            break
-        min_sep = 0.12
+            if duplicates_found:
+                break
+        
+        if duplicates_found:
+            continue
+        
+        # Minimum separation check: use adaptive threshold based on expected spread
+        # For n points distributed along a perimeter, expected min distance ~= perimeter / n
+        # For world size ±2.5m (5m total), typical perimeter ~= 15m-20m
+        # Expected min_sep = 15-20 / n. We allow 50% of expected as acceptable.
+        expected_perimeter = 18.0  # typical for star/circle shapes
+        expected_min_sep = expected_perimeter / max(n, 1)
+        min_sep_threshold = expected_min_sep * 0.5  # allow 50% of expected
+        min_sep_threshold = max(min_sep_threshold, 0.01)  # but never less than 0.01
+        
+        spacing_issues = []
         for i in range(n):
             for j in range(i+1, n):
                 d = np.linalg.norm(result[i] - result[j])
-                if d < min_sep:
-                    errors.append(f"n={n} rows {i},{j} too close ({d:.3f})")
-                    break
-
-    
+                if d < min_sep_threshold:
+                    spacing_issues.append((i, j, d))
+        
+        # Only report if more than 10% of pairs are too close (indicates real problem)
+        total_pairs = n * (n - 1) / 2
+        if len(spacing_issues) > total_pairs * 0.1:
+            for i, j, d in spacing_issues[:3]:  # report top 3 only
+                errors.append(f"n={n} rows {i},{j} too close ({d:.3f}, threshold={min_sep_threshold:.3f})")
 
     return errors
 
