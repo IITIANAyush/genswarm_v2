@@ -172,6 +172,7 @@ class Simulator:
         Call controller_step with a special 'global_init' flag.
         If the controller returns a dict mapping robot_id -> target, store it.
         """
+        result = None
         try:
             result = self.ctrl(-1, {}, {
                 "mode":           "global_init",
